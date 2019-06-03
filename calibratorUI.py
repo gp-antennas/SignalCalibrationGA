@@ -35,20 +35,23 @@ meanVal = 0.5
 
 
 # GENETIC ALGORITHM 1 PARAMETERS
-# What percent of the next gen is evolved by this algorithm?
-Alg1Percent = 10
+# What number of the next gen is evolved by this algorithm?
+# Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
+Alg1Number = 10
 
 
 # GENETIC ALGORITHM 2 PARAMETERS
-# What percent of the next gen is evolved by this algorithm?
-Alg2Percent = 80
+# What number of the next gen is evolved by this algorithm?
+# Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
+Alg2Number = 10
 # What fraction of competitors should alg 2's tournament use?
 Alg2competitorFrac = 0.25
 
 
 # GENETIC ALGORITHM 3 PARAMETERS
-# What percent of the next gen is evolved by this algorithm?
-Alg3Percent = 10
+# What number of the next gen is evolved by this algorithm?
+# Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
+Alg3Number = 10
 # What fraction of competitors should alg 3's tournament use?
 Alg3competitorFrac = 0.25
 # What number of nodes should be crossed over to make offspring?
@@ -58,7 +61,7 @@ nodesCrossed = 10
 
 
 # Fitness score breakdown. Must add to popMax
-fitBreakdown = [Alg1Percent, Alg2Percent, Alg3Percent]
+fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
 
 main.main(genMax, popMax, fitType, fitBreakdown, \
 		valRange, meanVal, Alg2competitorFrac,	\
