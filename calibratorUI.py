@@ -19,7 +19,7 @@ import calibratorMain as main
 saveName = "evolvedValues"
 
 # Maximum number of Generations?
-genMax = 10
+genMax = 200
 
 # Maximum population size?
 popMax = 100
@@ -31,7 +31,7 @@ fitType = 1
 valRange = 1.
 
 # Mean value? What is the range centered on?
-meanVal = 0.5
+valMean = 0.5
 
 
 # GENETIC ALGORITHM 1 PARAMETERS
@@ -43,7 +43,7 @@ Alg1Number = 10
 # GENETIC ALGORITHM 2 PARAMETERS
 # What number of the next gen is evolved by this algorithm?
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
-Alg2Number = 10
+Alg2Number = 80
 # What fraction of competitors should alg 2's tournament use?
 Alg2competitorFrac = 0.25
 
@@ -64,7 +64,7 @@ nodesCrossed = 10
 fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
 
 main.main(genMax, popMax, fitType, fitBreakdown, \
-		valRange, meanVal, Alg2competitorFrac,	\
+		valRange, valMean, Alg2competitorFrac,	\
 		nodesCrossed, Alg3competitorFrac, saveName)
 
 

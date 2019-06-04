@@ -11,6 +11,7 @@ Comments:		There will be a main fitness score function called
 				score for now to emulate the real thing.
 """
 import numpy as np
+import os.path # For checking if indivHistory file exists
 
 
 
@@ -48,8 +49,13 @@ def FitnessTest(pop, fitType):
 	else:
 		print("Error: fitType value not 1 or 2")
 		return
+
 	# Now sort these by greatest to least score
 	rScores, rPop = Sort(scores, pop)
+
+	# Integrate these new individuals and scores in the indivHistory.csv file
+	#UpdateIndivHistory(rScores, rPop, fitType)
+
 	return rScores, rPop
 
 
@@ -61,7 +67,7 @@ def FScoreDummy(pop):
 	calculate the chi squared between our individual and the goal 
 	values (goalVal).
 	"""
-	goalFile = "data/goalValues.csv"
+	goalFile = "data/dummyScore/goalValues.csv"
 	goalVal = np.genfromtxt(goalFile, delimiter=",")
 	
 	# Now we create the fitness scores (scores) by calculating the 
@@ -77,9 +83,96 @@ def FScoreDummy(pop):
 	return 1./(scores + eps)
 
 
+
 def FScoreReal(pop):
 
 	return
+
+
+
+def CalcDiversity(indivs, valRange):
+
+	diversity = 0
+	for nodeInd in range(indivs.shape[1]):
+		diversity += np.std(indivs[:,nodeInd])
+
+	return diversity/(valRange*0.36442)
+
+import random
+pop = np.zeros((100, 127))
+valRange = 10
+meanVal = 0.5
+
+div = []
+for i in range(100):
+	for indiv in range(100): # For each individual
+		for node in range(127): # For each node
+			pop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
+
+	diversity = CalcDiversity(pop, valRange)
+	div.append(diversity)
+
+mean = np.mean(np.array(div))
+print(pop.shape, mean)
+
+def UpdateIndivHistory(rScores, rPop, fitType):
+	# Combine the scores and pop into one matrix. Each row has the score
+	# first, then it's associated individual. The rows are ranked best to
+	# worst.
+	currentData = np.hstack((rScores.reshape((rScores.shape[0],1)), rPop))
+
+	# Choose the file location based on the fitType
+	if fitType == 1:
+		fileName = "data/dummyScore/indivHistory.csv"
+	elif fitType == 2:
+		fileName = "data/realScore/indivHistory.csv"
+
+	if os.path.isfile(fileName) is False: # If the file does not exist
+		np.savetxt(fileName, currentData, delimiter=',')
+	else: # If the file exists
+		# We need to insert each element in the correct place in the file
+		# Grab the history matrix
+		indivHist = np.genfromtxt(fileName, delimiter=',')
+
+		# Create a new combined dataset
+		combData = np.zeros((indivHist.shape[0]+currentData.shape[0], \
+						indivHist.shape[1]))
+		# We need an index for indivHist and for currentData
+		hInd, cInd = 0, 0
+
+		for i in range(combData.shape[0]):# For each future entry in combData
+			# There are many cases to consider
+			# First, check if cInd is out of bounds for currentData
+			if cInd + 1 > currentData.shape[0]:
+				# If so, just copy over indivHist
+				combData[i] = indivHist[hInd]
+				hInd += 1
+			# Next, check if hInd is out of bounds for indivHist
+			elif hInd + 1 > indivHist.shape[0]:
+				# If so, just copy over currentData
+				combData[i] = currentData[cInd]
+				cInd += 1
+			# Now, if we have values for both currentData and indivHist,
+			# if the current data value is larger
+			elif currentData[cInd,0] > indivHist[hInd,0]:
+				# Copy over currentData's value
+				combData[i] = currentData[cInd]
+				cInd += 1
+			# Finally, if we have values for both currentData and indivHist,
+			# if the indivHist is larger (or equal to)
+			else:
+				# Copy over indivHist's value
+				combData[i] = indivHist[hInd]
+				hInd += 1
+		# Now, we rewrite indivHistory.csv with the new combData
+		np.savetxt(fileName, combData, delimiter=',')
+	return
+
+
+
+
+
+
 
 
 """
