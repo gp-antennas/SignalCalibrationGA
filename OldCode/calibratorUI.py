@@ -57,17 +57,17 @@ Alg3competitorFrac = 0.25
 # What number of nodes should be crossed over to make offspring?
 nodesCrossed = 10
 
-# GENETIC ALGORITHM 4 PARAMETERS
 
-epsPercent = 10**(-3)
 
 
 # Fitness score breakdown. Must add to popMax
 fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
 
 main.main(genMax, popMax, fitType, fitBreakdown, \
-		valRange, valMean, Alg2competitorFrac, nodesCrossed, \
-		Alg3competitorFrac, epsPercent, \
-		saveName)
+		valRange, valMean, Alg2competitorFrac,	\
+		nodesCrossed, Alg3competitorFrac, saveName)
+
+
+
 
 

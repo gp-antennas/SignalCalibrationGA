@@ -23,9 +23,8 @@ import calibratorFScore as FScore
 
 
 def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
-		valRange=1, meanVal=0.5, Alg2competitorFrac=0.25, nodesCrossed=4, \
-		Alg3competitorFrac=0.25, epsPercent=10**(-3), \
-		saveName="evolvedValues"):
+		valRange=1, meanVal=0.5, Alg2competitorFrac=0.25,	\
+		nodesCrossed=4, Alg3competitorFrac=0.25, saveName="evolvedValues"):
 
 	# Print what the user chose
 	PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, \
@@ -69,23 +68,10 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 		newPop3 = GA.Alg3(rScore, rPop, fitBreakdown[2], nodesCrossed,
 					Alg3competitorFrac)
 		
-		newPop23 = np.vstack((newPop2, newPop3))
-
-		
+		newPop = np.vstack((newPop1, newPop2, newPop3))
 
 		# CALCULATE FITNESS SCORES
-		newScores1 = rScore[fitBreakdown[0]]
-		newScores23 = FScore.FitnessTest(newPop23, fitType)
-
-		newPop = np.vstack((newPop1, newPop23))
-		newScores = np.concatenate((mewScores1, newScores23))
-
-
-		divScores, divPop = Alg4(newScores, newPop, valRange, meanVal, fitType,\
-					epsPercent=epsPercent)
-
-		# Now sort these by greatest to least score
-		rScores, rPop = Sort(divScores, divPop)
+		rScore, rPop = FScore.FitnessTest(newPop, fitType)
 	
 	# Record the last score
 	bestScores[gen] = rScore[0]
@@ -183,24 +169,6 @@ def PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, \
 	print(str(fitBreakdown[2])+" Individals")
 	print("A tournament competitors fraction of: "+str(Alg3competitorFrac))
 	print("Number of nodes crossed in offspring are: "+str(nodesCrossed)+"\n")
-
-def Sort(scores, pop):
-	"""
-	This function sorts both the fitness scores and the individuals
-	in a population from greatest score to least score.Check first 
-	to make sure the scores and pop arrays have the same length.
-	"""
-	if scores.shape[0]!=pop.shape[0]:
-		print("Error, sorting sizes are not the same.")
-		return
-	# zip them into one list
-	combined = zip(scores, pop)
-	# Sort from greatest to least
-	sortedScores = sorted(combined, key=lambda t:t[0], reverse=True)
-	# unzip them into ranked scores and ranked population
-	rScores, rPop = zip(*sortedScores)
-	# Return them as numpy arrays (not lists)
-	return np.asarray(rScores), np.asarray(rPop)
 
 def PrintGenData(rScore, rPop, valRange, gen):
 	# Calculate the diversity

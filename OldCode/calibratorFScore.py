@@ -15,6 +15,26 @@ import os.path # For checking if indivHistory file exists
 
 
 
+def Sort(scores, pop):
+	"""
+	This function sorts both the fitness scores and the individuals
+	in a population from greatest score to least score.Check first 
+	to make sure the scores and pop arrays have the same length.
+	"""
+	if scores.shape[0]!=pop.shape[0]:
+		print("Error, sorting sizes are not the same.")
+		return
+	# zip them into one list
+	combined = zip(scores, pop)
+	# Sort from greatest to least
+	sortedScores = sorted(combined, key=lambda t:t[0], reverse=True)
+	# unzip them into ranked scores and ranked population
+	rScores, rPop = zip(*sortedScores)
+	# Return them as numpy arrays (not lists)
+	return np.asarray(rScores), np.asarray(rPop)
+
+
+
 def FitnessTest(pop, fitType):
 	"""
 	This function is called by calibratorMain.py to choose the fitness
@@ -29,6 +49,9 @@ def FitnessTest(pop, fitType):
 	else:
 		print("Error: fitType value not 1 or 2")
 		return
+
+	# Now sort these by greatest to least score
+	rScores, rPop = Sort(scores, pop)
 
 	# Integrate these new individuals and scores in the indivHistory.csv file
 	#UpdateIndivHistory(rScores, rPop, fitType)
@@ -66,6 +89,31 @@ def FScoreReal(pop):
 	return
 
 
+
+def CalcDiversity(indivs, valRange):
+
+	diversity = 0
+	for nodeInd in range(indivs.shape[1]):
+		diversity += np.std(indivs[:,nodeInd])
+
+	return diversity/(valRange*0.36442)
+
+import random
+pop = np.zeros((100, 127))
+valRange = 10
+meanVal = 0.5
+
+div = []
+for i in range(100):
+	for indiv in range(100): # For each individual
+		for node in range(127): # For each node
+			pop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
+
+	diversity = CalcDiversity(pop, valRange)
+	div.append(diversity)
+
+mean = np.mean(np.array(div))
+print(pop.shape, mean)
 
 def UpdateIndivHistory(rScores, rPop, fitType):
 	# Combine the scores and pop into one matrix. Each row has the score
