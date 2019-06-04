@@ -24,12 +24,13 @@ import calibratorFScore as FScore
 
 def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 		valRange=1, meanVal=0.5, Alg2competitorFrac=0.25, nodesCrossed=4, \
-		Alg3competitorFrac=0.25, epsPercent=10**(-3), \
+		Alg3competitorFrac=0.25, epsPercent=10**(-3), useAlg4 =True,\
 		saveName="evolvedValues"):
 
 	# Print what the user chose
 	PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, \
-		Alg2competitorFrac,	nodesCrossed, Alg3competitorFrac)
+		Alg2competitorFrac,	nodesCrossed, Alg3competitorFrac, epsPercent, \
+		useAlg4)
 
 	# Check to make sure sum of fitBreakdown = popMax
 	if np.sum(np.array(fitBreakdown)) != popMax:
@@ -44,8 +45,10 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 			pop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
 
 	# CALCULATE FITNESS SCORES
-	# These are the ranked fitness scores and ranked population
-	rScore, rPop = FScore.FitnessTest(pop, fitType)
+	# These are the fitness scores from pur population
+	scores = FScore.FitnessTest(pop, fitType)
+	# We now rank them
+	rScores, rPop = Sort(scores, pop)
 
 	# BEGIN EVOLUTION
 	bestScores = np.zeros((genMax))
@@ -54,45 +57,53 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 
 		# A print statement to show the user current progress
 		if gen%10 == 0:
-			PrintGenData(rScore, rPop, valRange, gen)
+			PrintGenData(rScores, rPop, valRange, gen)
 		
-		# Record the best one
-		bestScores[gen] = rScore[0]
+		# Record the best score
+		bestScores[gen] = rScores[0]
 
 		# RUN GENETIC ALGORITHMS
 		# We now begin creating the new population
-		newPop1 = GA.Alg1(rScore, rPop, fitBreakdown[0])
-
-		newPop2 = GA.Alg2(rScore, rPop, fitBreakdown[1], valRange, \
-					meanVal, Alg2competitorFrac)
-
-		newPop3 = GA.Alg3(rScore, rPop, fitBreakdown[2], nodesCrossed,
-					Alg3competitorFrac)
 		
+		newPop1 = GA.Alg1(rScores, rPop, fitBreakdown[0])
+		
+		newPop2 = GA.Alg2(rScores, rPop, fitBreakdown[1], valRange, \
+					meanVal, Alg2competitorFrac)
+		
+		newPop3 = GA.Alg3(rScores, rPop, fitBreakdown[2], nodesCrossed,
+					Alg3competitorFrac)
+	
+		# Combine the results of Alg 2 and Alg 3
 		newPop23 = np.vstack((newPop2, newPop3))
 
-		
-
 		# CALCULATE FITNESS SCORES
-		newScores1 = rScore[fitBreakdown[0]]
+		# The scores for Alg1 are just those from the previous gen
+		newScores1 = rScores[:fitBreakdown[0]]
+		# Calculate the scores for the result of Alg 2 and 3
 		newScores23 = FScore.FitnessTest(newPop23, fitType)
 
+		# Stitch the population and scores back together
 		newPop = np.vstack((newPop1, newPop23))
-		newScores = np.concatenate((mewScores1, newScores23))
+		newScores = np.concatenate((newScores1, newScores23))
 
+		# If we are using Algorithm 4:
+		if useAlg4:
+			# Remove unnecessary duplicate individuals
+			divScores, divPop = GA.Alg4(newScores, newPop, valRange, meanVal, \
+									fitType, epsPercent=epsPercent)
+		else:
+			# Just copy it over
+			divScores, divPop = newScores, newPop
 
-		divScores, divPop = Alg4(newScores, newPop, valRange, meanVal, fitType,\
-					epsPercent=epsPercent)
-
-		# Now sort these by greatest to least score
+		# Now finally sort these by greatest to least score
 		rScores, rPop = Sort(divScores, divPop)
 	
 	# Record the last score
-	bestScores[gen] = rScore[0]
+	bestScores[gen] = rScores[0]
 	
 	# Print the last generation's data
 	print("\nLast Generation")
-	PrintGenData(rScore, rPop, valRange, genMax)
+	PrintGenData(rScores, rPop, valRange, genMax)
 
 	#print("Best Score Array: ", rPop[0])
 
@@ -105,9 +116,9 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 			delimiter=',')		
 	
 	# Plot results
-	Plot(bestScores, rPop[0], genMax, saveName)
+	Plot(bestScores, rPop[0], genMax, saveName) # FIX
 
-	return
+	return rScores[0]
 
 
 
@@ -159,7 +170,8 @@ def Plot(bestScores, bestIndiv, genMax, saveName):
 	plt.show()
 
 def PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, \
-		Alg2competitorFrac,	nodesCrossed, Alg3competitorFrac):
+		Alg2competitorFrac,	nodesCrossed, Alg3competitorFrac, epsPercent, \
+		useAlg4):
 	print("Your Chosen Evolution Parameters:\n")
 	print("Number of generations: "+str(genMax))
 	print("Number of individuals in a population:"+str(popMax)+"\n")
@@ -184,6 +196,10 @@ def PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, \
 	print("A tournament competitors fraction of: "+str(Alg3competitorFrac))
 	print("Number of nodes crossed in offspring are: "+str(nodesCrossed)+"\n")
 
+	print("For Algorithm 4 (Diversity), you have chosen:")
+	print("The fourth algorithm is running: "+str(useAlg4))
+	print(f"Individuals must be {epsPercent:.3f}% different\n")
+
 def Sort(scores, pop):
 	"""
 	This function sorts both the fitness scores and the individuals
@@ -202,12 +218,12 @@ def Sort(scores, pop):
 	# Return them as numpy arrays (not lists)
 	return np.asarray(rScores), np.asarray(rPop)
 
-def PrintGenData(rScore, rPop, valRange, gen):
+def PrintGenData(rScores, rPop, valRange, gen):
 	# Calculate the diversity
 	div = CalcDiversity(rPop, valRange)
 	# Print the generation's data
 	print("Gen: "+str(gen)+f", Diversity: {div:.1f}%, Top 4 Scores: "+ \
-		str(rScore[:4]))
+		str(rScores[:4]))
 	return
 
 def CalcDiversity(indivs, valRange):

@@ -67,7 +67,7 @@ def FScoreDummy(pop):
 	calculate the chi squared between our individual and the goal 
 	values (goalVal).
 	"""
-	goalFile = "data/dummyScore/goalValues.csv"
+	goalFile = "/home/suren/Github/SignalCalibrationGA/data/dummyScore/goalValues.csv"
 	goalVal = np.genfromtxt(goalFile, delimiter=",")
 	
 	# Now we create the fitness scores (scores) by calculating the 

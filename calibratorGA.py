@@ -14,6 +14,8 @@ Comments:		There are three genetic algorithms: Alg1, Alg2, and Alg3.
 import numpy as np
 import random
 
+import calibratorFScore as FScore
+
 def Tournament(rPop, numCompetitors):
 	"""
 	Gives (the index of) 1 winner out of a tournament of numCompetitors
@@ -135,15 +137,17 @@ def Alg4(scores, pop, valRange, meanVal, fitType, epsPercent=10**(-3)):
 	duplicates. So we scan through the NEW population and replace duplicates with 
 	a fresh random individual to preserve diversity.
 	"""
+
 	def AreSimilar(indivA, indivB):
 		# Takes 2 individuals and returns boolean True if they are similar
-		similar = False
+		# on EVERY node
+		similar = True
 
 		for k in range(1, indivA.shape[0]): # For each node (not the fScore)
-			# If node A and node B's abs difference is sufficiently small
-			if np.abs(indivA[k]-indivB[k]) < epsPercent*valRange:
-				# They are similar
-				similar = True
+			# If node A and node B's abs difference is sufficiently large
+			if np.abs(indivA[k]-indivB[k]) > epsPercent*valRange/100.:
+				# They are not similar
+				similar = False
 
 		return similar
 
@@ -154,36 +158,73 @@ def Alg4(scores, pop, valRange, meanVal, fitType, epsPercent=10**(-3)):
 
 	# Create a blank list that'll hold the index of genetically diverse indivs
 	divIndivs = []
+	# Put the first element in
+	divIndivs.append(popData[0])
 
-	for i in range(popData.shape[0]): # For each individual
+	# Count the total number of duplicates
+	numDuplicates = 0
 
-		for j in range(len(divIndivs)): # Scan through the diverse indivs
+	for i in range(1, popData.shape[0]): # For each individual except first
+
+		# We need to count which divIndivs indiv we are checking
+		j = 0 # The divIndivs index
+		# We also need to go until we find only 1 duplicate
+		noithDuplicate = True
+
+		# Scan through the diverse indivs until we find a duplicate
+		while j < len(divIndivs) and noithDuplicate: 
+			
 			# If individual i is not similar to individual j
 			if AreSimilar(divIndivs[j], popData[i]) is False:
 				# Add it to the list of diverse individuals
 				divIndivs.append(popData[i])
+				# Flip the flag saying we did find a duplicate
+				noithDuplicate = False
+			else:
+				numDuplicates += 1
+				#print("\nfound Duplicate\n") # FIX
+			j += 1
 
-	# Make these diverse individuals a numpy array
-	divPopData = np.array(divIndivs)
-	# Reseperate fitness score from individuals
-	divScores = divPopData[:,0].flatten()
-	divPop = divPopData[:,1:]
+	# If there are actually duplicates
+	if numDuplicates > .5:
+		# Make these diverse individuals a numpy array
+		divPopData = np.array(divIndivs)
+		# Reseperate fitness score from individuals
+		divScores = divPopData[:,0].flatten()
+		divPop = divPopData[:,1:]
 
-	# Now we need to add random individuals for the ones we lost
-	numRandIndivs = scores.shape[0]-divScores.shape[0]
-	randPop = np.zeros((numRandIndivs, pop.shape[1]))
+		# Now we need to add random individuals for the ones we lost
+		numRandIndivs = scores.shape[0]-divScores.shape[0]
+		randPop = np.zeros((numRandIndivs, pop.shape[1]))
 
-	# Populate the random individuals
-	for indiv in range(numRandIndivs): # For each individual
-		for node in range(pop.shape[1]): # For each node
-			randPop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
-	# Calculate their scores
-	randScores = FitnessTest(randPop, fitType)
+		# Populate the random individuals
+		for indiv in range(numRandIndivs): # For each individual
+			for node in range(pop.shape[1]): # For each node
+				randPop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
+		# Calculate their scores
+		randScores = FScore.FitnessTest(randPop, fitType)
 
-	# Finally, combine them with the original diverse individuals and send the
-	# new population back
+		# Finally, combine them with the original diverse individuals and send the
+		# new population back
 
-	returnScores = np.concatenate((divScores, randScores))
-	returnPop = np.vstack((divPop, randPop))
+		returnScores = np.concatenate((divScores, randScores))
+		returnPop = np.vstack((divPop, randPop))
 
+	# If there are no duplicates
+	else:
+		returnScores = scores
+		returnPop = pop
+	#print(f"Found {numDuplicates:f}")
 	return returnScores, returnPop
+
+'''
+scores = np.ones((3))
+
+pop = np.array([[1,2],[1.500001,2],[5,6]])
+
+retScores, retPop = Alg4(scores, pop, valRange=10, meanVal=10, fitType=-1, \
+						epsPercent=5)
+
+print(retScores)
+print(retPop)
+'''

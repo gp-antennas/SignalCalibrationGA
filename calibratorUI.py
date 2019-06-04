@@ -19,7 +19,7 @@ import calibratorMain as main
 saveName = "evolvedValues"
 
 # Maximum number of Generations?
-genMax = 200
+genMax = 500
 
 # Maximum population size?
 popMax = 100
@@ -58,16 +58,29 @@ Alg3competitorFrac = 0.25
 nodesCrossed = 10
 
 # GENETIC ALGORITHM 4 PARAMETERS
-
-epsPercent = 10**(-3)
-
+# Should we use algorithm 4 at all?
+useAlg4 = True
+# What percent different should any individual be from another?
+# To get physical difference, calculate epsPercent*valRange
+epsPercent = 10**(-8)
 
 # Fitness score breakdown. Must add to popMax
 fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
 
-main.main(genMax, popMax, fitType, fitBreakdown, \
+
+
+bestScore = main.main(genMax, popMax, fitType, fitBreakdown, \
 		valRange, valMean, Alg2competitorFrac, nodesCrossed, \
-		Alg3competitorFrac, epsPercent, \
+		Alg3competitorFrac, epsPercent, useAlg4, \
 		saveName)
 
+'''
+scores = np.zeros((10))
+for i in range(10):
+	scores[i] = main.main(genMax, popMax, fitType, fitBreakdown, \
+		valRange, valMean, Alg2competitorFrac, nodesCrossed, \
+		Alg3competitorFrac, epsPercent, useAlg4, \
+		saveName)
 
+print(np.mean(scores), np.std(scores))
+'''

@@ -19,11 +19,10 @@ import calibratorMain as main
 saveName = "evolvedValues"
 
 # Maximum number of Generations?
-genMax = 200
+genMax = 500
 
 # Maximum population size?
 popMax = 100
-
 # Fitness score type? 1 = dummy, 2 = real
 fitType = 1
 
@@ -62,12 +61,13 @@ nodesCrossed = 10
 
 # Fitness score breakdown. Must add to popMax
 fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
-
-main.main(genMax, popMax, fitType, fitBreakdown, \
+scores = np.zeros((10))
+for i in range(10):
+	scores[i] = main.main(genMax, popMax, fitType, fitBreakdown, \
 		valRange, valMean, Alg2competitorFrac,	\
 		nodesCrossed, Alg3competitorFrac, saveName)
 
 
-
+print(np.mean(scores), np.std(scores))
 
 

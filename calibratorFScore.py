@@ -26,6 +26,8 @@ def FitnessTest(pop, fitType):
 		scores = FScoreDummy(pop)
 	elif fitType == 2:
 		scores = FScoreReal(pop)
+	elif fitType == -1: # FIX
+		scores = np.ones((pop.shape[0]))
 	else:
 		print("Error: fitType value not 1 or 2")
 		return
@@ -33,7 +35,7 @@ def FitnessTest(pop, fitType):
 	# Integrate these new individuals and scores in the indivHistory.csv file
 	#UpdateIndivHistory(rScores, rPop, fitType)
 
-	return rScores, rPop
+	return scores
 
 
 def FScoreDummy(pop):

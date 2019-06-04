@@ -27,8 +27,8 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 		nodesCrossed=4, Alg3competitorFrac=0.25, saveName="evolvedValues"):
 
 	# Print what the user chose
-	PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, \
-		Alg2competitorFrac,	nodesCrossed, Alg3competitorFrac)
+	#PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, \
+	#	Alg2competitorFrac,	nodesCrossed, Alg3competitorFrac)
 
 	# Check to make sure sum of fitBreakdown = popMax
 	if np.sum(np.array(fitBreakdown)) != popMax:
@@ -52,8 +52,8 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 	for gen in range(genMax): # For each generation
 
 		# A print statement to show the user current progress
-		if gen%10 == 0:
-			PrintGenData(rScore, rPop, valRange, gen)
+		#if gen%10 == 0:
+			#PrintGenData(rScore, rPop, valRange, gen)
 		
 		# Record the best one
 		bestScores[gen] = rScore[0]
@@ -81,7 +81,7 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 	PrintGenData(rScore, rPop, valRange, genMax)
 
 	#print("Best Score Array: ", rPop[0])
-
+	'''
 	# Save the best one with name saveName
 	if fitType == 1:
 		np.savetxt('results/dummyScore/'+saveName+'_Gen'+str(genMax)+'.csv', rPop[0], \
@@ -89,11 +89,11 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 	elif fitType == 2:
 		np.savetxt('results/realScore/'+saveName+'_Gen'+str(genMax)+'.csv', rPop[0], \
 			delimiter=',')		
-	
+	'''
 	# Plot results
-	Plot(bestScores, rPop[0], genMax, saveName)
+	#Plot(bestScores, rPop[0], genMax, saveName)
 
-	return
+	return rScore[0]
 
 
 
