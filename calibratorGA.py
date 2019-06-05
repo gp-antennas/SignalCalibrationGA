@@ -67,7 +67,7 @@ def Alg2(rScores, rPop, numOffspring, valRange, meanVal, \
 		
 		for j in range(10):
 			# We need a location for mutation (node) and a mutation value
-			# The node can be any value in the range [0, 126]
+			# The node can be any value in the range [0, 125]
 			whichNode = random.randint(0, rPop.shape[1]-1)
 			# Now we choose a new random value for the node
 			newVal = valRange*(random.random() - 0.5) + meanVal
@@ -113,7 +113,7 @@ def Alg3(rScores, rPop, numOffspring, nodesCrossed, competitorFrac=0.25):
 			# We need unique locations for crossover (nodes)
 			whichNode = np.zeros((nodesCrossed)).astype(int)
 			for k in range(nodesCrossed):
-				# The node can be any value in the range [0, 126]
+				# The node can be any value in the range [0, 125]
 				whichNode[k] = random.randint(0, rPop.shape[1]-1)
 
 			# This process creates two offspring. First, copy parents over

@@ -22,7 +22,7 @@ import calibratorFScore as FScore
 
 
 
-def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
+def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10], \
 		valRange=1, meanVal=0.5, Alg2competitorFrac=0.25, nodesCrossed=4, \
 		Alg3competitorFrac=0.25, epsPercent=10**(-3), useAlg4 =True,\
 		saveName="evolvedValues"):
@@ -38,10 +38,10 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 		return
 
  	# INITIALIZE POPULATION
-	pop = np.zeros((popMax, 127))
+	pop = np.zeros((popMax, numNodes))
 
 	for indiv in range(popMax): # For each individual
-		for node in range(127): # For each node
+		for node in range(numNodes): # For each node
 			pop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
 
 	# CALCULATE FITNESS SCORES
@@ -130,12 +130,13 @@ def Plot(bestScores, bestIndiv, genMax, saveName):
 
 	# Make a list [0, 1, 2, ...] for generations
 	genVec = np.arange((bestScores.shape[0]))
-	# Make a list [0, 1, 2, ..., 126] for delta t (nodes)
+	# Make a list [0, 1, 2, ..., 125] for delta t (nodes)
 	nodeVec = np.arange((bestIndiv.shape[0]))
 
 	# Grab the goal values vector
+
 	goalFile = "data/dummyScore/goalValues.csv"
-	goalVal = np.genfromtxt(goalFile, delimiter=",")
+	goalVal = np.genfromtxt(goalFile, delimiter=",")[:bestIndiv.shape[0]]
 	
 	# Create a plot with 2 axes
 	fig = plt.figure(figsize=(30,8))

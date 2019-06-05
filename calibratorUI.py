@@ -24,6 +24,9 @@ genMax = 500
 # Maximum population size?
 popMax = 100
 
+# Number of Nodes?
+numNodes = 126
+
 # Fitness score type? 1 = dummy, 2 = real
 fitType = 1
 
@@ -69,18 +72,18 @@ fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
 
 
 
-bestScore = main.main(genMax, popMax, fitType, fitBreakdown, \
-		valRange, valMean, Alg2competitorFrac, nodesCrossed, \
-		Alg3competitorFrac, epsPercent, useAlg4, \
-		saveName)
+bestScore = main.main(genMax, popMax, numNodes, fitType, 
+				fitBreakdown, valRange, valMean, Alg2competitorFrac, \
+				nodesCrossed, Alg3competitorFrac, epsPercent, useAlg4, \
+				saveName)
 
 '''
 scores = np.zeros((10))
 for i in range(10):
-	scores[i] = main.main(genMax, popMax, fitType, fitBreakdown, \
-		valRange, valMean, Alg2competitorFrac, nodesCrossed, \
-		Alg3competitorFrac, epsPercent, useAlg4, \
-		saveName)
+	scores[i] = main.main(genMax, popMax, numNodes, fitType, 
+				fitBreakdown, valRange, valMean, Alg2competitorFrac, \
+				nodesCrossed, Alg3competitorFrac, epsPercent, useAlg4, \
+				saveName)
 
 print(np.mean(scores), np.std(scores))
 '''

@@ -40,14 +40,15 @@ def FitnessTest(pop, fitType):
 
 def FScoreDummy(pop):
 	"""
-	We grab a premade array of 127 random numbers between 0-1. These 
+	We grab a premade array of 126 random numbers between 0-1. These 
 	values will be our target. To make a new random number array, use 
 	the commented code below. To calculate the score, we simply 
 	calculate the chi squared between our individual and the goal 
 	values (goalVal).
 	"""
+	numNodes = pop.shape[1]
 	goalFile = "data/dummyScore/goalValues.csv"
-	goalVal = np.genfromtxt(goalFile, delimiter=",")
+	goalVal = np.genfromtxt(goalFile, delimiter=",")[:numNodes]
 	
 	# Now we create the fitness scores (scores) by calculating the 
 	# Chi Squared in a loop
@@ -131,7 +132,7 @@ def UpdateIndivHistory(rScores, rPop, fitType):
 
 """
 The below code writes a new goal string for the simple fitness score. It
-generates 127 random numbers from 0 to 1 and stores it in a file with name
+generates 126 random numbers from 0 to 1 and stores it in a file with name
 goalStr.
 """
 
@@ -139,8 +140,8 @@ goalStr.
 import random
 
 strName = "goalString"
-goalStr = np.zeros((127))
-for i in range(127):
+goalStr = np.zeros((126))
+for i in range(126):
 	goalStr[i] = random.random()
 
 print(goalStr)
