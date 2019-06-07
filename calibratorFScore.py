@@ -75,7 +75,8 @@ def getData(channel,pop):
                         evstr="0"+str(event)
                 
                 # print evstr
-                infile="/users/PCON0003/osu10643/src/SignalCalibrationGA/data/"+chstr+"withphase"+evstr+".txt"
+                #infile="/users/PCON0003/osu10643/src/SignalCalibrationGA/data/"+chstr+"withphase"+evstr+".txt"
+                infile = "data/"+chstr+"withphase"+evstr+".txt"
                 #the max time of the 126th (indexed from 0) sample  
                 temp=np.genfromtxt(infile, delimiter="\n")
                 phi0[event]=temp[0]

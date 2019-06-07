@@ -99,7 +99,7 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10]
     bestScores[gen] = rScores[0]
     
     # Print the last generation's data
-    print("nLast Generation")
+    print("Last Generation")
     PrintGenData(rScores, rPop, valRange, genMax)
 
     #print("Best Score Array: ", rPop[0])
