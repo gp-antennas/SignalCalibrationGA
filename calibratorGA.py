@@ -131,7 +131,7 @@ def Alg3(rScores, rPop, numOffspring, nodesCrossed, competitorFrac=0.25):
 
 
 
-def Alg4(scores, pop, valRange, meanVal, fitType, epsPercent=10**(-3)):
+def Alg4(scores, pop, valRange, meanVal, fitType, data, amp, phi0, epsPercent=10**(-3)):
 	"""
 	We don't want duplicates of individuals in our population, nor even almost
 	duplicates. So we scan through the NEW population and replace duplicates with 
@@ -202,7 +202,7 @@ def Alg4(scores, pop, valRange, meanVal, fitType, epsPercent=10**(-3)):
 			for node in range(pop.shape[1]): # For each node
 				randPop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
 		# Calculate their scores
-		randScores = FScore.FitnessTest(randPop, fitType)
+		randScores = FScore.FitnessTest(randPop, fitType, data, amp, phi0)
 
 		# Finally, combine them with the original diverse individuals and send the
 		# new population back

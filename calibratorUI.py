@@ -14,6 +14,7 @@ Comments:		I wrote this code seperately to simplify the useage of this
 
 import numpy as np
 import calibratorMain as main
+import sys
 
 # What save name should the best result have?
 saveName = "evolvedValues"
@@ -25,17 +26,19 @@ genMax = 500
 popMax = 100
 
 # Number of Nodes?
-numNodes = 126
+numNodes = 127
 
 # Fitness score type? 1 = dummy, 2 = real
-fitType = 1
+fitType = 2
 
 # Value range?
-valRange = 1.
+valRange = float(sys.argv[2])
 
 # Mean value? What is the range centered on?
-valMean = 0.5
+valMean = 0.
 
+#SURF channel?
+channel= sys.argv[1]
 
 # GENETIC ALGORITHM 1 PARAMETERS
 # What number of the next gen is evolved by this algorithm?
@@ -75,7 +78,7 @@ fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
 bestScore = main.main(genMax, popMax, numNodes, fitType, 
 				fitBreakdown, valRange, valMean, Alg2competitorFrac, \
 				nodesCrossed, Alg3competitorFrac, epsPercent, useAlg4, \
-				saveName)
+				saveName, channel)
 
 '''
 scores = np.zeros((10))

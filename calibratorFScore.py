@@ -12,10 +12,10 @@ Comments:		There will be a main fitness score function called
 """
 import numpy as np
 import os.path # For checking if indivHistory file exists
+import default as util
+import sys
 
-
-
-def FitnessTest(pop, fitType):
+def FitnessTest(pop, fitType, data, amp, phi0):
 	"""
 	This function is called by calibratorMain.py to choose the fitness
 	score type needed. It takes the population and an integer that tells
@@ -25,7 +25,7 @@ def FitnessTest(pop, fitType):
 	if fitType == 1:
 		scores = FScoreDummy(pop)
 	elif fitType == 2:
-		scores = FScoreReal(pop)
+		scores = FScoreReal(pop, data, amp, phi0)
 	elif fitType == -1: # FIX
 		scores = np.ones((pop.shape[0]))
 	else:
@@ -36,6 +36,56 @@ def FitnessTest(pop, fitType):
 	#UpdateIndivHistory(rScores, rPop, fitType)
 
 	return scores
+
+#function to get the data and store it in a matrix. 
+
+#TODO: make nEvents a command line arg
+
+def getData(channel,pop):
+        nEvents=50
+        
+
+        #the maximum time value.
+        maxt=40.-.3125;
+
+        # the evenly sampled times.
+        eTimes=np.linspace(0., maxt, 128)
+        # zero-crossing period (.5 period over frequency), currently unused
+        zCPeriod=.5/1.2;
+        #container to hold the scores
+        scores = np.zeros((pop.shape[0])) # pop.shape[0] = popMax
+        #container to hold the true sample times (from the gA)
+        tVec=np.zeros(128);
+        #fill a matrix of our data events, would be nice to do this outside of the fitness score loop.
+        data=np.zeros((nEvents, 128))        
+        phi0=np.zeros(nEvents)
+        amp=np.zeros(nEvents)
+        for event in range(nEvents):
+                #this is the data file. 
+                #the first entry is the initial phase
+                #the second entry is the amplitude
+                #the rest of the entries are the waveform data
+                evstr="00"
+                chstr=str(channel)
+                #print chstr
+                if event < 10 :
+                        evstr="00"+str(event)
+                        
+                elif event >= 10 and event < 100:
+                        evstr="0"+str(event)
+                
+                # print evstr
+                infile="/users/PCON0003/osu10643/src/SignalCalibrationGA/data/"+chstr+"withphase"+evstr+".txt"
+                #the max time of the 126th (indexed from 0) sample  
+                temp=np.genfromtxt(infile, delimiter="\n")
+                phi0[event]=temp[0]
+
+                amp[event]=temp[1]
+                trace=temp[2:]
+               # phi0[event]=util.getInstPhase(eTimes,trace, 0)
+                data[event]=util.normalize(trace)
+        return data, amp, phi0
+
 
 
 def FScoreDummy(pop):
@@ -64,9 +114,45 @@ def FScoreDummy(pop):
 
 
 
-def FScoreReal(pop):
+def FScoreReal(pop, data, amp, phi0):
+        #progress indicator
+        print (".")
+        sys.stdout.flush()        
+        
+        #TODO: 
+        #would be good to have an argument for the channel we're calibrating
+        #would be nice to make this an argument.
+        nEvents=data.shape[0]
+        
 
-	return
+        #the maximum time value.
+        maxt=40.-.3125;
+
+        # the evenly sampled times.
+        eTimes=np.linspace(0., maxt, 128)
+        # zero-crossing period (.5 period over frequency), currently unused
+        zCPeriod=.5/1.2;
+        #container to hold the scores
+        scores = np.zeros((pop.shape[0])) # pop.shape[0] = popMax
+        #container to hold the true sample times (from the gA)
+        tVec=np.zeros(128);
+
+
+        for i in range(scores.size):
+                #set the times for entries above 0 to the individual values
+                tVec[1:]=pop[i]
+  
+                #the sample times from the GA
+                rTimes=tVec+eTimes
+
+                for event in range(nEvents):
+#                        print phi0[event], amp[event]
+                        cw=util.sampledCW(1.2, amp[event], rTimes, phi0[event])                        
+                        ipScore=np.dot(util.normalize(cw), data[event])
+                        scores[i]+=ipScore
+        return scores/nEvents
+
+
 
 
 
