@@ -12,7 +12,7 @@ Comments:		There will be a main fitness score function called
 """
 import numpy as np
 import os.path # For checking if indivHistory file exists
-import default as util
+import util
 import sys
 
 def FitnessTest(pop, fitType, data, amp, phi0):
@@ -117,8 +117,8 @@ def FScoreDummy(pop):
 
 def FScoreReal(pop, data, amp, phi0):
         #progress indicator
-        print (".")
-        sys.stdout.flush()        
+        #print (".")
+        #sys.stdout.flush()        
         
         #TODO: 
         #would be good to have an argument for the channel we're calibrating
