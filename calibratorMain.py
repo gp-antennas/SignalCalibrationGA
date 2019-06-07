@@ -106,10 +106,10 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10]
 
     # Save the best one with name saveName
     if fitType == 1:
-        np.savetxt('results/dummyScore/'+saveName+'_Gen'+str(genMax)+'.csv', rPop[0], 
+        np.savetxt('results/dummyScore/'+saveName+'_ch'+str(channel)+'_Gen'+str(genMax)+'.csv', rPop[0], 
             delimiter=',')
     elif fitType == 2:
-        np.savetxt('results/realScore/'+saveName+'_Gen'+str(genMax)+'.csv', rPop[0], 
+        np.savetxt('results/realScore/'+saveName+'_ch'+str(channel)+'_Gen'+str(genMax)+'.csv', rPop[0], 
             delimiter=',')        
     
     # Plot results
@@ -117,55 +117,100 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10]
 
     return rScores[0]
 
-
-
 def Plot(bestScores, bestIndiv, genMax, saveName):
-    # Plot the result using matplotlib
-    import matplotlib.pyplot as plt
-    # Allows for integer ticks in plot's x axis
-    from matplotlib.ticker import MaxNLocator
+	# Plot the result using matplotlib
+	import matplotlib.pyplot as plt
+	# Allows for integer ticks in plot's x axis
+	from matplotlib.ticker import MaxNLocator
 
-    # Make a list [0, 1, 2, ...] for generations
-    genVec = np.arange((bestScores.shape[0]))
-    # Make a list [0, 1, 2, ..., 125] for delta t (nodes)
-    nodeVec = np.arange((bestIndiv.shape[0]))
+	# Make a list [0, 1, 2, ...] for generations
+	genVec = np.arange((bestScores.shape[0]))
+	# Make a list [0, 1, 2, ..., 126] for delta t (nodes)
+	nodeVec = np.arange((bestIndiv.shape[0]))
 
-    # Grab the goal values vector
+	
+	# Create a plot with 2 axes
+	fig = plt.figure(figsize=(30,8))
+	ax1 = fig.add_subplot(1,2,1)
+	ax2 = fig.add_subplot(1,2,2)
 
-    goalFile = "data/dummyScore/goalValues.csv"
-    goalVal = np.genfromtxt(goalFile, delimiter=",")[:bestIndiv.shape[0]]
+	# Plot progress over generations
+	ax1.scatter(genVec, bestScores, color='green', marker='o') 
+	
+	ax1.set_xlabel('Generation', fontsize=18)
+	ax1.set_ylabel('Fitness Score (Normalized inner product)', fontsize=18)
+	ax1.set_title('Fitness Scores over the Generations', fontsize=22)
+	ax1.xaxis.set_tick_params(labelsize=20)
+	ax1.yaxis.set_tick_params(labelsize=20)
+	# Force integer ticks
+	ax1.xaxis.set_major_locator(MaxNLocator(integer=True)) 
+
+
+	# Plot goal vector in green
+	print(nodeVec.shape)
+
+#	ax2.plot(nodeVec, goalVal, c='g') # Plot original data
+	# Plot best result vector in red dotted
+	ax2.plot(nodeVec, bestIndiv, c='r')#, linestyle='--')
+	ax2.set_xlabel('Sample Number', fontsize=18)
+	ax2.set_ylabel(r'sample $\delta t$ (ns)', fontsize=18)
+	ax2.set_title('Best Solution', fontsize=22)
+	ax2.xaxis.set_tick_params(labelsize=20)
+	ax2.yaxis.set_tick_params(labelsize=20)
+	# Force integer ticks
+	ax2.xaxis.set_major_locator(MaxNLocator(integer=True)) 
+	
+	plt.savefig('data/'+saveName+'_Gen'+str(genMax)+'Plot.png')
+	plt.show()
+
+
+# def Plot(bestScores, bestIndiv, genMax, saveName):
+#     # Plot the result using matplotlib
+#     import matplotlib.pyplot as plt
+#     # Allows for integer ticks in plot's x axis
+#     from matplotlib.ticker import MaxNLocator
+
+#     # Make a list [0, 1, 2, ...] for generations
+#     genVec = np.arange((bestScores.shape[0]))
+#     # Make a list [0, 1, 2, ..., 125] for delta t (nodes)
+#     nodeVec = np.arange((bestIndiv.shape[0]))
+
+#     # Grab the goal values vector
+
+#     goalFile = "data/dummyScore/goalValues.csv"
+#     goalVal = np.genfromtxt(goalFile, delimiter=",")[:bestIndiv.shape[0]]
     
-    # Create a plot with 2 axes
-    fig = plt.figure(figsize=(30,8))
-    ax1 = fig.add_subplot(1,2,1)
-    ax2 = fig.add_subplot(1,2,2)
+#     # Create a plot with 2 axes
+#     fig = plt.figure(figsize=(30,8))
+#     ax1 = fig.add_subplot(1,2,1)
+#     ax2 = fig.add_subplot(1,2,2)
 
-    # Plot progress over generations
-    ax1.scatter(genVec, bestScores, color='green', marker='o') 
+#     # Plot progress over generations
+#     ax1.scatter(genVec, bestScores, color='green', marker='o') 
     
-    ax1.set_xlabel('Generation', fontsize=18)
-    ax1.set_ylabel('Fitness Score (Inverse of Chi Squared)', fontsize=18)
-    ax1.set_title('Fitness Scores over the Generations', fontsize=22)
-    ax1.xaxis.set_tick_params(labelsize=20)
-    ax1.yaxis.set_tick_params(labelsize=20)
-    # Force integer ticks
-    ax1.xaxis.set_major_locator(MaxNLocator(integer=True)) 
+#     ax1.set_xlabel('Generation', fontsize=18)
+#     ax1.set_ylabel('Fitness Score (Inverse of Chi Squared)', fontsize=18)
+#     ax1.set_title('Fitness Scores over the Generations', fontsize=22)
+#     ax1.xaxis.set_tick_params(labelsize=20)
+#     ax1.yaxis.set_tick_params(labelsize=20)
+#     # Force integer ticks
+#     ax1.xaxis.set_major_locator(MaxNLocator(integer=True)) 
 
 
-    # Plot goal vector in green
-    ax2.plot(nodeVec, goalVal, c='g') # Plot original data
-    # Plot best result vector in red dotted
-    ax2.plot(nodeVec, bestIndiv, c='r', linestyle='--')
-    ax2.set_xlabel('Node Number', fontsize=18)
-    ax2.set_ylabel('Value at Node', fontsize=18)
-    ax2.set_title('Best Solution vs. Goal', fontsize=22)
-    ax2.xaxis.set_tick_params(labelsize=20)
-    ax2.yaxis.set_tick_params(labelsize=20)
-    # Force integer ticks
-    ax2.xaxis.set_major_locator(MaxNLocator(integer=True)) 
+#     # Plot goal vector in green
+#     ax2.plot(nodeVec, goalVal, c='g') # Plot original data
+#     # Plot best result vector in red dotted
+#     ax2.plot(nodeVec, bestIndiv, c='r', linestyle='--')
+#     ax2.set_xlabel('Node Number', fontsize=18)
+#     ax2.set_ylabel('Value at Node', fontsize=18)
+#     ax2.set_title('Best Solution vs. Goal', fontsize=22)
+#     ax2.xaxis.set_tick_params(labelsize=20)
+#     ax2.yaxis.set_tick_params(labelsize=20)
+#     # Force integer ticks
+#     ax2.xaxis.set_major_locator(MaxNLocator(integer=True)) 
     
-    plt.savefig('results/'+saveName+'_Gen'+str(genMax)+'Plot.png')
-    plt.show()
+#     plt.savefig('results/'+saveName+'_Gen'+str(genMax)+'Plot.png')
+#     plt.show()
 
 def PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, 
         Alg2competitorFrac,    nodesCrossed, Alg3competitorFrac, epsPercent, 
