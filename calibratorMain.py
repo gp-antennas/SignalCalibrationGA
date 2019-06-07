@@ -24,7 +24,7 @@ import calibratorFScore as FScore
 
 def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 		valRange=1, meanVal=0.5, Alg2competitorFrac=0.25,	\
-		nodesCrossed=4, Alg3competitorFrac=0.25, saveName="evolvedValues"):
+		nodesCrossed=4, Alg3competitorFrac=0.25, saveName="evolvedValues", channel=0):
 
 	# Check to make sure sum of fitBreakdown = popMax
 	if np.sum(np.array(fitBreakdown)) != popMax:
@@ -34,16 +34,21 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
  	# INITIALIZE POPULATION
 	pop = np.zeros((popMax, 127))
 
+        #get data used to calculate fitness score:
+        data, amp, phi0=FScore.getData(channel, pop)
+
 	for indiv in range(popMax): # For each individual
 		for node in range(127): # For each node
 			pop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
 
 	# CALCULATE FITNESS SCORES
 	# These are the ranked fitness scores and ranked population
-	rScore, rPop = FScore.FitnessTest(pop, fitType)
+	rScore, rPop = FScore.FitnessTest(pop, fitType, data, amp, phi0)
 
 	# BEGIN EVOLUTION
 	bestScores = np.zeros((genMax))
+
+
 
 	for gen in range(genMax): # For each generation
 
@@ -67,7 +72,7 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 		newPop = np.vstack((newPop1, newPop2, newPop3))
 
 		# CALCULATE FITNESS SCORES
-		rScore, rPop = FScore.FitnessTest(newPop, fitType)
+		rScore, rPop = FScore.FitnessTest(newPop, fitType, data, amp, phi0)
 	
 	# Record the last score
 	bestScores[gen] = rScore[0]
@@ -77,11 +82,11 @@ def main(genMax=100, popMax=50, fitType=1, fitBreakdown=[10,80,10], \
 	print("Best Score Array: ", rPop[0])
 
 	# Save the best one with name saveName
-	np.savetxt('data/'+saveName+'_Gen'+str(genMax)+'.csv', rPop[0], \
-		delimiter=',')
+	np.savetxt('data/'+saveName+'_ch'+str(channel)+'_Gen'+str(genMax)+'.csv', rPop[0], delimiter=',')
+	np.savetxt('data/'+saveName+'_ch'+str(channel)+'_Gen'+str(genMax)+'Scores.csv', bestScores, delimiter=',')
 	
 	# Plot results
-	plot(bestScores, rPop[0], genMax, saveName)
+	plot2(bestScores, rPop[0], genMax, saveName)
 
 	return
 
@@ -136,3 +141,52 @@ def plot(bestScores, bestIndiv, genMax, saveName):
 	plt.savefig('data/'+saveName+'_Gen'+str(genMax)+'Plot.png')
 	plt.show()
 
+
+def plot2(bestScores, bestIndiv, genMax, saveName):
+	# Plot the result using matplotlib
+	import matplotlib.pyplot as plt
+	# Allows for integer ticks in plot's x axis
+	from matplotlib.ticker import MaxNLocator
+
+	# Make a list [0, 1, 2, ...] for generations
+	genVec = np.arange((bestScores.shape[0]))
+	# Make a list [0, 1, 2, ..., 126] for delta t (nodes)
+	nodeVec = np.arange((bestIndiv.shape[0]))
+
+	# Grab the goal values vector
+	goalFile = "data/goalValues.csv"
+	goalVal = np.genfromtxt(goalFile, delimiter=",")
+	
+	# Create a plot with 2 axes
+	fig = plt.figure(figsize=(30,8))
+	ax1 = fig.add_subplot(1,2,1)
+	ax2 = fig.add_subplot(1,2,2)
+
+	# Plot progress over generations
+	ax1.scatter(genVec, bestScores, color='green', marker='o') 
+	
+	ax1.set_xlabel('Generation', fontsize=18)
+	ax1.set_ylabel('Fitness Score (Normalized inner product)', fontsize=18)
+	ax1.set_title('Fitness Scores over the Generations', fontsize=22)
+	ax1.xaxis.set_tick_params(labelsize=20)
+	ax1.yaxis.set_tick_params(labelsize=20)
+	# Force integer ticks
+	ax1.xaxis.set_major_locator(MaxNLocator(integer=True)) 
+
+
+	# Plot goal vector in green
+	print(nodeVec.shape)
+	print(goalVal.shape)
+#	ax2.plot(nodeVec, goalVal, c='g') # Plot original data
+	# Plot best result vector in red dotted
+	ax2.plot(nodeVec, bestIndiv, c='r')#, linestyle='--')
+	ax2.set_xlabel('Node Number', fontsize=18)
+	ax2.set_ylabel('Value at Node', fontsize=18)
+	ax2.set_title('Best Solution', fontsize=22)
+	ax2.xaxis.set_tick_params(labelsize=20)
+	ax2.yaxis.set_tick_params(labelsize=20)
+	# Force integer ticks
+	ax2.xaxis.set_major_locator(MaxNLocator(integer=True)) 
+	
+	plt.savefig('data/'+saveName+'_Gen'+str(genMax)+'Plot.png')
+	plt.show()
