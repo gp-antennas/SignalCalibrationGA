@@ -4,9 +4,9 @@ Hello! This the readme for the SURF Signal Calibration Program
 
 OVERVIEW:
 	
-    This program is used to find the best calibrate the sine wave 
-    signals recorded at SLAC by the SURF. 
-    To run, use the following command:
+    This program is used to find the best calibration for the sine
+    wave signals recorded at SLAC by the SURF. To run, use the
+    following command:
     python3 calibratorUI.py [which channel?] [valRange value?]
 
 CODE:
