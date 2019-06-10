@@ -150,32 +150,34 @@ def Alg4(rScores, rPop, numOffspring, valRange, meanVal, \
 	mutation size fraction) 10 seperate times to obtain 10 offspring. 
 	This whole process is done (numOffspring/10) times.
 	"""
-
 	def GenNewVal(currVal):
-		# Get a random value in range [-1, 1]
-		modulator = (random.random() - 0.5)*2.
-		# Trim mutRange by this value and add it to the current value
-		newVal = currVal + mutRange * modulator
-
-		# If the value lies above the range of accepted values
-		if newVal > meanVal + valRange/2.:
-			# Give it the maximum value instead
-			newVal = meanVal + valRange/2.
-
-		# If the value lies below the range of accepted values 
-		elif newVal < meanVal - valRange/2.:
-			# Give it the minimum value instead
-			newVal = meanVal - valRange/2.
-
-		return newVal
+		"""
+		Find the range of values to choose within, then choose a 
+		random number in this range
+		"""
+		# The expected upper and lower bound are:
+		upperBound = currVal + mutSizeFrac*valRange
+		lowerBound = currVal - mutSizeFrac*valRange
+		# If the upper bound lies above the range of accepted values
+		if upperBound > maxVal:
+			# Set it equal to maxVal
+			upperBound = maxVal
+			print('lower bd')
+		# If the lower bound lies below the range of accepted values 
+		if lowerBound < minVal:
+			# Set it equal to minVal
+			lowerBound = minVal
+			print('upper bd')
+		# Finally, choose a random number in this range
+		return random.uniform(lowerBound, upperBound)
 
 	# Initialize the offspring
 	offspring = np.zeros((numOffspring, rPop.shape[1]))
 	# Calculate the number of competitors
 	numCompetitors = int(competitorFrac*rPop.shape[0])
-	# Calculate the mutation range. Mutations can move the node's 
-	# value by as much as this.
-	mutRange = mutSizeFrac*valRange
+	# Store the max and min values allowed
+	maxVal = meanVal + valRange/2.
+	minVal = meanVal - valRange/2.
 	
 	for i in range(int(numOffspring/10.0)):
 		# We need to perform a tournament selection to get 1 winner 

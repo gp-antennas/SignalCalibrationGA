@@ -20,7 +20,7 @@ import sys                      # Used to access arguments given by terminal
 saveName = "evolvedValues"
 
 # Maximum number of Generations?
-genMax = 500
+genMax = 10
 
 # Maximum population size?
 popMax = 100
@@ -69,7 +69,7 @@ nodesCrossed = 10
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
 Alg4Number = 10
 # What fraction of competitors should alg 4's tournament use?
-Alg4competitorFrac = 0.25
+Alg4competitorFrac = 0.1
 # What fraction of valRange can the node's mutation take?
 mutSizeFrac = 0.1
 

@@ -135,10 +135,25 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, 		\
         np.savetxt('results/realScore/'+saveName+'_ch'+str(channel)+ \
         	'_Gen'+str(genMax)+'.csv', rPop[0], delimiter=',')        
     
+    # Save the result in the csv
+    AddToCSV(genMax, popMax, numNodes, fitType, 	\
+    		fitBreakdown, valRange, meanVal,	\
+    		channel,							\
+    		Alg2competitorFrac, 				\
+    		nodesCrossed, Alg3competitorFrac, 	\
+    		Alg4competitorFrac, mutSizeFrac,	\
+    		epsPercent, useAlg5, rScores[0])
+
     # Plot results
     Plot(bestScores, rPop[0], genMax, saveName)
 
     return rScores[0]
+
+
+
+
+
+
 
 def Plot(bestScores, bestIndiv, genMax, saveName):
 	# Plot the result using matplotlib
@@ -326,3 +341,42 @@ def CalcDiversity(indivs, valRange):
     # The number 0.36442 was found by testing diversity/valRange for random 
     # populations and seeing what we got.
     return diversity/(valRange*0.36442)
+
+def AddToCSV(genMax, popMax, numNodes, fitType, 	\
+    		fitBreakdown, valRange, meanVal,	\
+    		channel,							\
+    		Alg2competitorFrac, 				\
+    		nodesCrossed, Alg3competitorFrac, 	\
+    		Alg4competitorFrac, mutSizeFrac,	\
+    		epsPercent, useAlg5, bestScore):
+	
+	import os.path # For checking if indivHistory file exists
+	fileName = 'results/AutoTrials/autoTrials.csv'
+
+	useA5 = 0
+	if useAlg5:
+		useA5 = 1
+
+	header = "genMax, popMax, numNodes, fitType, valRange, meanVal"  \
+			+", Channel, Alg1Numb, Alg2Numb, Alg3Numb, Alg4Numb, " 	 \
+			+"Alg2CompFrac, nodesCrossed, Alg3CompFrac, Alg4CompFrac"\
+			+", mutSizeFrac, useAlg5, epsPercent, bestScore\n"
+
+	data = np.array([genMax, popMax, numNodes, fitType, valRange, 	\
+			meanVal, channel, fitBreakdown[0], fitBreakdown[1], 	\
+			fitBreakdown[2], fitBreakdown[3], Alg2competitorFrac,	\
+			nodesCrossed, Alg3competitorFrac, Alg4competitorFrac,	\
+			mutSizeFrac, useA5, epsPercent, bestScore]).astype(float)
+
+	# # If the file does not exist, add the header
+	if os.path.isfile(fileName) is False: 
+		file = open(fileName, 'w+')
+		file.write(header)
+		file.close()
+	
+	# Append the data
+	file = open(fileName, 'a')
+	np.savetxt(file, [data], delimiter=',')
+	file.close()
+
+	return
