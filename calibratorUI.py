@@ -12,9 +12,9 @@ Comments:		I wrote this code seperately to simplify the useage of this
 				program. Most knobs to adjust the code are shown here.
 """
 
-import numpy as np
-import calibratorMain as main
-import sys
+import numpy as np              # Array manipulation
+import calibratorMain as main   # Get the main function to run the program
+import sys                      # Used to access arguments given by terminal
 
 # What save name should the best result have?
 saveName = "evolvedValues"
@@ -49,7 +49,7 @@ Alg1Number = 10
 # GENETIC ALGORITHM 2 PARAMETERS
 # What number of the next gen is evolved by this algorithm?
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
-Alg2Number = 80
+Alg2Number = 70
 # What fraction of competitors should alg 2's tournament use?
 Alg2competitorFrac = 0.25
 
@@ -63,22 +63,40 @@ Alg3competitorFrac = 0.25
 # What number of nodes should be crossed over to make offspring?
 nodesCrossed = 10
 
+
 # GENETIC ALGORITHM 4 PARAMETERS
-# Should we use algorithm 4 at all?
-useAlg4 = True
+# What number of the next gen is evolved by this algorithm?
+# Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
+Alg4Number = 10
+# What fraction of competitors should alg 4's tournament use?
+Alg4competitorFrac = 0.25
+# What fraction of valRange can the node's mutation take?
+mutSizeFrac = 0.1
+
+
+# GENETIC ALGORITHM 5 PARAMETERS
+# Should we use algorithm 5 at all?
+useAlg5 = True
 # What percent different should any individual be from another?
 # To get physical difference, calculate epsPercent*valRange
 epsPercent = 10**(-8)
 
 # Fitness score breakdown. Must add to popMax
-fitBreakdown = [Alg1Number, Alg2Number, Alg3Number]
+fitBreakdown = [Alg1Number, Alg2Number, Alg3Number, Alg4Number]
 
 
-
-bestScore = main.main(genMax, popMax, numNodes, fitType, 
-				fitBreakdown, valRange, valMean, Alg2competitorFrac, \
-				nodesCrossed, Alg3competitorFrac, epsPercent, useAlg4, \
-				saveName, channel)
+					# General Variables
+bestScore = main.main(genMax, popMax, numNodes, fitType, 	\
+					fitBreakdown, valRange, valMean,		\
+					saveName, channel,						\
+					# Algorithm 2 Variables
+					Alg2competitorFrac, 					\
+					# Algorithm 3 Variables
+					nodesCrossed, Alg3competitorFrac, 		\
+					# Algorithm 4 Variables
+					Alg4competitorFrac, mutSizeFrac, 		\
+					# Algorithm 5 Variables
+					epsPercent, useAlg5)
 
 '''
 scores = np.zeros((10))

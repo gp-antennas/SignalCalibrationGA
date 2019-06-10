@@ -21,11 +21,28 @@ import calibratorGA as GA
 import calibratorFScore as FScore
 
 
-
-def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10],  valRange=1, meanVal=0.5, Alg2competitorFrac=0.25, nodesCrossed=4,   Alg3competitorFrac=0.25, epsPercent=10**(-3), useAlg4 =True, saveName="evolvedValues", channel=0):
+		# General Variables
+def main(genMax=100, popMax=50, numNodes=126, fitType=1, 		\
+		fitBreakdown=[10,50,10,30], valRange=1, meanVal=0.5,	\
+		saveName="evolvedValues", channel=0,					\
+		# Algorithm 2 Variables
+		Alg2competitorFrac=0.25, 								\
+		# Algorithm 3 Variables
+		nodesCrossed=4, Alg3competitorFrac=0.25, 				\
+		# Algorithm 4 Variables
+		Alg4competitorFrac=0.25, mutSizeFrac=0.2, 				\
+		# Algorithm 5 Variables
+		epsPercent=10**(-3), useAlg5 =True						\
+		):
 
     # Print what the user chose
-    PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal,       Alg2competitorFrac,    nodesCrossed, Alg3competitorFrac, epsPercent,         useAlg4)
+    PrintIC(genMax, popMax, numNodes, fitType, 	\
+    		fitBreakdown, valRange, meanVal,	\
+    		saveName, channel,					\
+    		Alg2competitorFrac, 				\
+    		nodesCrossed, Alg3competitorFrac, 	\
+    		Alg4competitorFrac, mutSizeFrac,	\
+    		epsPercent, useAlg5)
 
     # Check to make sure sum of fitBreakdown = popMax
     if np.sum(np.array(fitBreakdown)) != popMax:
@@ -34,10 +51,10 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10]
 
     # INITIALIZE POPULATION
     pop = np.zeros((popMax, numNodes))
-    #initialize the fitness data
+    # Initialize the fitness score data
     data,amp,phi0=FScore.getData(channel, pop)
 
-
+    # Populate the population with uniformly sampled random data
     for indiv in range(popMax): # For each individual
         for node in range(numNodes): # For each node
             pop[indiv,node] = valRange*(random.random() - 0.5) + meanVal
@@ -63,31 +80,37 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10]
         # RUN GENETIC ALGORITHMS
         # We now begin creating the new population
         
-        newPop1 = GA.Alg1(rScores, rPop, fitBreakdown[0])
+        newPop1 = GA.Alg1(rPop, fitBreakdown[0])
         
-        newPop2 = GA.Alg2(rScores, rPop, fitBreakdown[1], valRange, 
-                    meanVal, Alg2competitorFrac)
+        newPop2 = GA.Alg2(rScores, rPop, fitBreakdown[1], valRange, \
+                    	meanVal, Alg2competitorFrac)
         
-        newPop3 = GA.Alg3(rScores, rPop, fitBreakdown[2], nodesCrossed,
-                    Alg3competitorFrac)
-    
-        # Combine the results of Alg 2 and Alg 3
-        newPop23 = np.vstack((newPop2, newPop3))
+        newPop3 = GA.Alg3(rScores, rPop, fitBreakdown[2], \
+        				nodesCrossed, Alg3competitorFrac)
+
+        newPop4 = GA.Alg4(rScores, rPop, fitBreakdown[3], valRange, \
+        				meanVal, Alg4competitorFrac, mutSizeFrac)
+        
+        # Combine the results of Alg 2, Alg 3, and Alg 4
+        newPop23 = np.vstack((newPop2, newPop3, newPop4))
 
         # CALCULATE FITNESS SCORES
         # The scores for Alg1 are just those from the previous gen
         newScores1 = rScores[:fitBreakdown[0]]
-        # Calculate the scores for the result of Alg 2 and 3
-        newScores23 = FScore.FitnessTest(newPop23, fitType, data, amp, phi0)
+        # Calculate the scores for the result of Alg 2, 3, 4
+        newScores23 = FScore.FitnessTest(newPop23, fitType, data, \
+        								amp, phi0)
 
         # Stitch the population and scores back together
         newPop = np.vstack((newPop1, newPop23))
         newScores = np.concatenate((newScores1, newScores23))
 
-        # If we are using Algorithm 4:
-        if useAlg4:
+        # If we are using Algorithm 5:
+        if useAlg5:
             # Remove unnecessary duplicate individuals
-            divScores, divPop = GA.Alg4(newScores, newPop, valRange, meanVal, fitType, data, amp, phi0, epsPercent=epsPercent)
+            divScores, divPop = GA.Alg5(newScores, newPop, valRange,\
+            						meanVal, fitType, data, amp, 	\
+            						phi0, epsPercent=epsPercent)
         else:
             # Just copy it over
             divScores, divPop = newScores, newPop
@@ -106,14 +129,14 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, fitBreakdown=[10,80,10]
 
     # Save the best one with name saveName
     if fitType == 1:
-        np.savetxt('results/dummyScore/'+saveName+'_ch'+str(channel)+'_Gen'+str(genMax)+'.csv', rPop[0], 
-            delimiter=',')
+        np.savetxt('results/dummyScore/'+saveName+'_ch'+str(channel)+\
+        	'_Gen'+str(genMax)+'.csv', rPop[0], delimiter=',')
     elif fitType == 2:
-        np.savetxt('results/realScore/'+saveName+'_ch'+str(channel)+'_Gen'+str(genMax)+'.csv', rPop[0], 
-            delimiter=',')        
+        np.savetxt('results/realScore/'+saveName+'_ch'+str(channel)+ \
+        	'_Gen'+str(genMax)+'.csv', rPop[0], delimiter=',')        
     
     # Plot results
-    Plot(bestScores, rPop[0], genMax, saveName) # FIX
+    Plot(bestScores, rPop[0], genMax, saveName)
 
     return rScores[0]
 
@@ -212,36 +235,57 @@ def Plot(bestScores, bestIndiv, genMax, saveName):
 #     plt.savefig('results/'+saveName+'_Gen'+str(genMax)+'Plot.png')
 #     plt.show()
 
-def PrintIC(genMax, popMax, fitType, fitBreakdown, valRange, meanVal, 
-        Alg2competitorFrac,    nodesCrossed, Alg3competitorFrac, epsPercent, 
-        useAlg4):
-    print("Your Chosen Evolution Parameters:n")
-    print("Number of generations: "+str(genMax))
-    print("Number of individuals in a population:"+str(popMax)+"n")
+def PrintIC(genMax, popMax, numNodes, fitType, 	\
+    		fitBreakdown, valRange, meanVal,	\
+    		saveName, channel,					\
+    		Alg2competitorFrac, 				\
+    		nodesCrossed, Alg3competitorFrac, 	\
+    		Alg4competitorFrac, mutSizeFrac,	\
+    		epsPercent, useAlg5):
 
-    if fitType == 1:
-        print("You have chosen the dummy fitness score")
-    elif fitType == 2:
-        print("You have chosen the real fitness score")
+	print("EVOLUTION PARAMETERS:\n")
 
-    print("Data values are centered on "+str(meanVal)+" and have a range of "
-        +str(valRange)+" (so +/- "+str(valRange/2.)+")n")
+	print("Number of generations: "+str(genMax))
+	print("Number of individuals in a population:"+str(popMax))
+	print(f"Number of nodes: {numNodes}\n")
 
-    print("For Algorithm 1 (Survival of the Fittest), you have chosen:")
-    print(str(fitBreakdown[0])+" Individalsn")
+	if fitType == 1:
+		print("You have chosen the dummy fitness score\n")
+	elif fitType == 2:
+		print("You have chosen the real fitness score\n")
 
-    print("For Algorithm 2 (Mutation), you have chosen:")
-    print(str(fitBreakdown[1])+" Individals")
-    print("A tournament competitors fraction of: "+str(Alg2competitorFrac)+"n")
+	print("Data values are centered on "+str(meanVal)+" and have a " \
+		+"range of "+str(valRange)+" (so +/- "+str(valRange/2.)+")")
+	print('Results are being saved with the name "'+saveName+'"')
+	print(f'The channel accessed for events is: '+str(channel)+'\n')
 
-    print("For Algorithm 3 (Crossover), you have chosen:")
-    print(str(fitBreakdown[2])+" Individals")
-    print("A tournament competitors fraction of: "+str(Alg3competitorFrac))
-    print("Number of nodes crossed in offspring are: "+str(nodesCrossed)+"n")
+	print("For Algorithm 1 (Survival of the Fittest), you have " \
+		+"chosen:")
+	print(str(fitBreakdown[0])+" Individals\n")
 
-    print("For Algorithm 4 (Diversity), you have chosen:")
-    print("The fourth algorithm is running: "+str(useAlg4))
-    print(f"Individuals must be {epsPercent:.3f}% differentn")
+	print("For Algorithm 2 (Mutation), you have chosen:")
+	print(str(fitBreakdown[1])+" Individals")
+	print("A tournament competitors fraction of: "+ \
+		str(Alg2competitorFrac)+"\n")
+
+	print("For Algorithm 3 (Crossover), you have chosen:")
+	print(str(fitBreakdown[2])+" Individals")
+	print("A tournament competitors fraction of: "+ \
+		str(Alg3competitorFrac))
+	print("Number of nodes crossed in offspring are: "+ \
+		str(nodesCrossed)+"\n")
+
+	print("For Algorithm 4 (Fine Mutation), you have chosen:")
+	print(str(fitBreakdown[3])+" Individals")
+	print("A tournament competitors fraction of: "+ \
+		str(Alg4competitorFrac))
+	print("A mutation size fraction of: "+ \
+		str(mutSizeFrac)+"\n")
+
+
+	print("For Algorithm 5 (Diversity), you have chosen:")
+	print("Is it running?: "+str(useAlg5))
+	print(f"Individuals must be {epsPercent:.8f}% different\n")
 
 def Sort(scores, pop):
     """
