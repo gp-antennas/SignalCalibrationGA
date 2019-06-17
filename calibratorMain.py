@@ -19,6 +19,7 @@ import random
 
 import calibratorGA as GA
 import calibratorFScore as FScore
+#import GoogleSheets.addToGSpread as addToGSpread
 
 
 		# General Variables
@@ -143,7 +144,15 @@ def main(genMax=100, popMax=50, numNodes=126, fitType=1, 		\
     		nodesCrossed, Alg3competitorFrac, 	\
     		Alg4competitorFrac, mutSizeFrac,	\
     		epsPercent, useAlg5, rScores[0])
-
+    '''
+    addToGSpread(genMax, popMax, numNodes, fitType, 	\
+    		fitBreakdown, valRange, meanVal,	\
+    		channel,							\
+    		Alg2competitorFrac, 				\
+    		nodesCrossed, Alg3competitorFrac, 	\
+    		Alg4competitorFrac, mutSizeFrac,	\
+    		epsPercent, useAlg5, rScores[0])
+	'''
     # Plot results
     Plot(bestScores, rPop[0], genMax, saveName)
 
@@ -380,3 +389,4 @@ def AddToCSV(genMax, popMax, numNodes, fitType, 	\
 	file.close()
 
 	return
+

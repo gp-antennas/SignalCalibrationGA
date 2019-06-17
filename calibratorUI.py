@@ -20,7 +20,7 @@ import sys                      # Used to access arguments given by terminal
 saveName = "evolvedValues"
 
 # Maximum number of Generations?
-genMax = 10
+genMax = 400
 
 # Maximum population size?
 popMax = 100
@@ -51,7 +51,7 @@ Alg1Number = 10
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
 Alg2Number = 70
 # What fraction of competitors should alg 2's tournament use?
-Alg2competitorFrac = 0.25
+Alg2competitorFrac = 0.4
 
 
 # GENETIC ALGORITHM 3 PARAMETERS
@@ -59,9 +59,9 @@ Alg2competitorFrac = 0.25
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
 Alg3Number = 10
 # What fraction of competitors should alg 3's tournament use?
-Alg3competitorFrac = 0.25
+Alg3competitorFrac = 0.5
 # What number of nodes should be crossed over to make offspring?
-nodesCrossed = 10
+nodesCrossed = 50
 
 
 # GENETIC ALGORITHM 4 PARAMETERS
@@ -69,14 +69,14 @@ nodesCrossed = 10
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
 Alg4Number = 10
 # What fraction of competitors should alg 4's tournament use?
-Alg4competitorFrac = 0.1
+Alg4competitorFrac = 0.85
 # What fraction of valRange can the node's mutation take?
-mutSizeFrac = 0.1
+mutSizeFrac = 0.05
 
 
 # GENETIC ALGORITHM 5 PARAMETERS
 # Should we use algorithm 5 at all?
-useAlg5 = True
+useAlg5 = False
 # What percent different should any individual be from another?
 # To get physical difference, calculate epsPercent*valRange
 epsPercent = 10**(-8)
