@@ -194,7 +194,7 @@ def Plot(bestScores, bestIndiv, genMax, saveName):
 
 
 	# Plot goal vector in green
-	print(nodeVec.shape)
+	#print(nodeVec.shape)
 
 #	ax2.plot(nodeVec, goalVal, c='g') # Plot original data
 	# Plot best result vector in red dotted
@@ -207,7 +207,7 @@ def Plot(bestScores, bestIndiv, genMax, saveName):
 	# Force integer ticks
 	ax2.xaxis.set_major_locator(MaxNLocator(integer=True)) 
 	
-	plt.savefig('data/'+saveName+'_Gen'+str(genMax)+'Plot.png')
+	plt.savefig('results/'+saveName+'_Gen'+str(genMax)+'Plot.png')
 	plt.show()
 
 

@@ -1,6 +1,7 @@
 # SignalCalibrationGA
 
 Hello! This the readme for the SURF Signal Calibration Program
+Last Updated: 06/24/2019
 
 OVERVIEW:
 	
@@ -58,10 +59,14 @@ FOLDERS:
 		Holds the results from any runs we perform. All important runs
 		should be saved in their own folder.
 
+	GoogleSheets - 
+		Code and associated files for getting google spreadsheet 
+		writeout to work. Did not get it to work, so someone can work 
+		on that if interested.
 
 AUTHORS:
 
 	The genetic algorithms were written by Suren Gourapura, the 
 	fitness score was written by Steven Prohira, and the team of Eliot
-	Ferstl, Alex Patton, and Scott Janse tuned the variables to 
+	Ferstl, Alex Patton, and Scott Janse tuned the GA variables to 
 	maximize performance.

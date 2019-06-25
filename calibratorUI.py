@@ -17,13 +17,13 @@ import calibratorMain as main   # Get the main function to run the program
 import sys                      # Used to access arguments given by terminal
 
 # What save name should the best result have?
-saveName = "evolvedValues"
+saveName = "forPres"
 
 # Maximum number of Generations?
-genMax = 400
+genMax = 500
 
 # Maximum population size?
-popMax = 100
+popMax = 105
 
 # Number of Nodes?
 numNodes = 127
@@ -43,13 +43,13 @@ channel= sys.argv[1]
 # GENETIC ALGORITHM 1 PARAMETERS
 # What number of the next gen is evolved by this algorithm?
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
-Alg1Number = 10
+Alg1Number = 5
 
 
 # GENETIC ALGORITHM 2 PARAMETERS
 # What number of the next gen is evolved by this algorithm?
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
-Alg2Number = 70
+Alg2Number = 60
 # What fraction of competitors should alg 2's tournament use?
 Alg2competitorFrac = 0.4
 
@@ -57,9 +57,9 @@ Alg2competitorFrac = 0.4
 # GENETIC ALGORITHM 3 PARAMETERS
 # What number of the next gen is evolved by this algorithm?
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
-Alg3Number = 10
+Alg3Number = 20
 # What fraction of competitors should alg 3's tournament use?
-Alg3competitorFrac = 0.5
+Alg3competitorFrac = 0.4
 # What number of nodes should be crossed over to make offspring?
 nodesCrossed = 50
 
@@ -67,16 +67,16 @@ nodesCrossed = 50
 # GENETIC ALGORITHM 4 PARAMETERS
 # What number of the next gen is evolved by this algorithm?
 # Must be divisible by 10 (e.g. 0, 10, 20, 80, etc.)
-Alg4Number = 10
+Alg4Number = 20
 # What fraction of competitors should alg 4's tournament use?
-Alg4competitorFrac = 0.85
+Alg4competitorFrac = 0.4
 # What fraction of valRange can the node's mutation take?
-mutSizeFrac = 0.05
+mutSizeFrac = 0.1
 
 
 # GENETIC ALGORITHM 5 PARAMETERS
 # Should we use algorithm 5 at all?
-useAlg5 = False
+useAlg5 = True
 # What percent different should any individual be from another?
 # To get physical difference, calculate epsPercent*valRange
 epsPercent = 10**(-8)

@@ -126,7 +126,26 @@ def Plot(data1, data2, data3, fSin, fCos, fScore, leftXLim=128):
 	dat3x, dat3y = data3
 	sinX, sinY = fSin
 	cosX, cosY = fCos
+
+
+
+
 	
+	# THE CODE BELOW CALCULATES FFT OF REVERSE FFT, COMMENT OUT THIS
+	# AND THE ADDITIONAL AX2.SCATTER'S FOR NORMAL PLOTS
+	ffSin = np.zeros((len(cosX)))
+	ffCos = np.zeros((len(cosX)))
+
+	# Calculate the fourier series coefficients to the NMax'th coefficient
+	for i in range(len(cosX)):
+		# Store the calculated fourier series in seperate arrays
+		# You can change gaData to sinData, to see how much better the 
+		# interpolation works on well-sampled and noiseless data
+		ffSin[i], ffCos[i] = CalcFourierCoeffs(i, 40, data3)
+
+
+
+
 	# Create a plot with 2 axes
 	fig = plt.figure(figsize=(30,8))
 	ax1 = fig.add_subplot(1,2,1)
@@ -154,7 +173,10 @@ def Plot(data1, data2, data3, fSin, fCos, fScore, leftXLim=128):
 	# Plot progress over generations
 	ax2.scatter(sinX, sinY, color='green', label='sine', marker='x',\
 				s=100) 
-	ax2.scatter(cosX, cosY, color='blue', label='cosine', marker='o') 
+	ax2.scatter(cosX, cosY, color='blue', label='cosine', marker='o')
+	ax2.scatter(sinX, ffSin, color='red', label='FFsine', marker='x',\
+				s=100) 
+	ax2.scatter(cosX, ffCos, color='yellow', label='FFcosine', marker='o') 
 	ax2.set_xlabel('Coefficient', fontsize=18)
 	ax2.set_ylabel('Value', fontsize=18)
 	ax2.set_title('Fourier Series Coefficients', fontsize=22)
@@ -163,8 +185,8 @@ def Plot(data1, data2, data3, fSin, fCos, fScore, leftXLim=128):
 	ax2.legend()
 	# Force integer ticks
 	ax2.xaxis.set_major_locator(MaxNLocator(integer=True)) 
-	plt.savefig('Ch5Ev000NCoeffs'+str(len(cosX) -1)+f'FS{fScore:.4}'+\
-				'Plot2.png')
+	plt.savefig('results/Ch5Ev000NCoeffs'+str(len(cosX) -1)+ \
+				f'FS{fScore:.4}Plot2.png')
 	plt.show()
 
 # Start the clock
@@ -185,7 +207,7 @@ sinData = getCW(T, freq, amp, phase, num=disc)
 # This number is the highest fourier series coefficient that will 
 # be calculated. It is currently 10 more than what seems to be the
 # optimal solution of 48 = T*freq (for some reason) 
-fSeriesNMax = 40 # int(round(T*freq)) + 10
+fSeriesNMax =  int(round(T*freq))
 
 # Create empty arrays to hold the sine and cosine fourier coeffs
 # Note, the zeroth sine coefficient is always 0, and fCos[0]=a_0
