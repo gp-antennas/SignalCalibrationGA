@@ -80,9 +80,17 @@ def CalcFourierCoeffs(m, T, funcData):
 
 
 # Use the fourier coefficients to construct the interpolated data
-def FourierSeries(sinCoeffs, cosCoeffs, T, num=1000):
-	# Populate the times
-	xVals = np.linspace(0, T, num=num)
+# Can either request evenly sampled data using num datapoints, or 
+# can pass own xVals array to get an unevenly sampled interpolation
+def FourierSeries(sinCoeffs, cosCoeffs, T, num=0, xVals=0):
+	# If an xVals value was not given by user for evenly sampled data
+	if np.sum(xVals) < 10e-8:
+		# If a num value was also not given by the user
+		if num == 0:
+			print("Error, num and xVals in FourierSeries() are zero")
+			return
+		# Otherwise, populate the times
+		xVals = np.linspace(0, T, num=num)
 	# Add the a_0 coefficient
 	sum = cosCoeffs[0]
 	# Add the remaining coefficients
@@ -92,9 +100,22 @@ def FourierSeries(sinCoeffs, cosCoeffs, T, num=1000):
 	# Return fSeriesData, a tuple of x and y values
 	return xVals, sum
 
+# Use the same dot product method to get fit wellness
+def CalcDotProd(gaData, fSeriesData):
+	# Steven's function to normalize data
+	def normalize(a):
+		length=len(a)
+		avec=np.array(a, dtype='float')
+		norm=np.sqrt(np.sum(avec*avec))
+		return avec/norm
+
+	normGA = normalize(gaData[1])
+	normfSeries = normalize(fSeriesData[1])
+
+	return np.dot(normGA, normfSeries)
 
 # Plot the results
-def Plot(data1, data2, data3, fSin, fCos, leftXLim=128):
+def Plot(data1, data2, data3, fSin, fCos, fScore, leftXLim=128):
 	# Plot the result using matplotlib
 	import matplotlib.pyplot as plt
 	# Allows for integer ticks in plot's x axis
@@ -119,8 +140,8 @@ def Plot(data1, data2, data3, fSin, fCos, leftXLim=128):
 	ax1.set_xlabel('Time (ns)', fontsize=18)
 	ax1.set_xlim(-1, leftXLim)
 	ax1.set_ylabel('Amplitude', fontsize=18)
-	ax1.set_title('Comparison of CW, Data, and Reconstruction', \
-				fontsize=22)
+	ax1.set_title('Comparison of CW, Data, and Interpolation with '+ \
+				f'Fitness Score {fScore:.4}', fontsize=22)
 	ax1.xaxis.set_tick_params(labelsize=20)
 	ax1.yaxis.set_tick_params(labelsize=20)
 	ax1.legend()
@@ -142,7 +163,8 @@ def Plot(data1, data2, data3, fSin, fCos, leftXLim=128):
 	ax2.legend()
 	# Force integer ticks
 	ax2.xaxis.set_major_locator(MaxNLocator(integer=True)) 
-	plt.savefig('Ch5Ev000NCoeffs'+str(len(cosX))+'Plot.png')
+	plt.savefig('Ch5Ev000NCoeffs'+str(len(cosX) -1)+f'FS{fScore:.4}'+\
+				'Plot2.png')
 	plt.show()
 
 # Start the clock
@@ -163,7 +185,7 @@ sinData = getCW(T, freq, amp, phase, num=disc)
 # This number is the highest fourier series coefficient that will 
 # be calculated. It is currently 10 more than what seems to be the
 # optimal solution of 48 = T*freq (for some reason) 
-fSeriesNMax = int(round(T*freq)) + 10
+fSeriesNMax = 40 # int(round(T*freq)) + 10
 
 # Create empty arrays to hold the sine and cosine fourier coeffs
 # Note, the zeroth sine coefficient is always 0, and fCos[0]=a_0
@@ -189,6 +211,14 @@ fSeriesData = FourierSeries(fSin, fCos, T, num=disc)
 # Print how long the actual code took
 print(f"Program took {time.time() - start_time:.3} seconds" )
 
+# Calculate how well we did using the same dot product method used for
+# the fitness score. We need the same uneven sampling of the fourier
+# series, so we recalculate using gaTimes
+gaTimes, _ = gaData
+fSeriesUnevenData = FourierSeries(fSin, fCos, T, xVals=gaTimes)
+fScore = CalcDotProd(gaData, fSeriesUnevenData)
+print(fScore)
+
 # Plot the results
 Plot(sinData, gaData, fSeriesData, fSeriesSinData, fSeriesCosData, \
-	leftXLim= 10)
+	fScore, leftXLim= 10)
