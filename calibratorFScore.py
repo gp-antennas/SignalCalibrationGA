@@ -86,6 +86,7 @@ def getData(channel,pop):
                 trace=temp[2:]
                # phi0[event]=util.getInstPhase(eTimes,trace, 0)
                 data[event]=util.normalize(trace)
+                
         return data, amp, phi0
 
 
